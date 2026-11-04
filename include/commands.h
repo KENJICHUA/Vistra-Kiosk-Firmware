@@ -10,6 +10,7 @@
 #include "height.h"
 #include "temperature.h"
 #include "heart.h"
+#include "weight.h"
 
 void dispatchCommand(const char* cmd);
 

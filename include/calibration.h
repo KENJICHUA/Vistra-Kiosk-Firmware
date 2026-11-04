@@ -9,11 +9,13 @@
 extern float g_sensorToFloorCm;
 extern float g_tempCalScale;
 extern float g_tempCalOffset;
+extern float g_weightScaleFactor;
+extern float g_weightOffset;
 
 // ---- EEPROM layout ----
 static constexpr int kEepromAddr = 0;
 static constexpr uint16_t kCalMagic = 0x4B43;   // "KC"
-static constexpr uint8_t kCalVersion = 1;
+static constexpr uint8_t kCalVersion = 2;        // v2 adds weight calibration
 
 struct CalibrationRecord {
   uint16_t magic;
@@ -21,6 +23,8 @@ struct CalibrationRecord {
   float    sensorToFloorCm;
   float    tempCalScale;
   float    tempCalOffset;
+  float    weightScaleFactor;
+  float    weightOffset;
   uint16_t checksum;
 };
 

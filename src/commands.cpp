@@ -9,6 +9,8 @@ static void printStatus() {
   Serial.print(g_heartReady ? F("true") : F("false"));
   Serial.print(F(",\"temperature\":"));
   Serial.print(g_mlxReady ? F("true") : F("false"));
+  Serial.print(F(",\"weight\":"));
+  Serial.print(g_weightReady ? F("true") : F("false"));
   Serial.println(F("}"));
 }
 
@@ -62,6 +64,40 @@ static void calSetTempOffset(const char* valueStr) {
   g_tempCalOffset = val;
   Serial.print(F("{\"type\":\"calibration\",\"status\":\"set\",\"temp_cal_offset\":"));
   Serial.print(g_tempCalOffset, 2);
+  Serial.println(F("}"));
+}
+
+static void calSetWeightScale(const char* valueStr) {
+  if (!valueStr || *valueStr == '\0') {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing value\"}"));
+    return;
+  }
+  float val = atof(valueStr);
+  if (val <= 0.0f || val > 100000.0f) {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"value out of range\"}"));
+    return;
+  }
+  g_weightScaleFactor = val;
+  weightSensor.set_scale(g_weightScaleFactor);
+  Serial.print(F("{\"type\":\"calibration\",\"status\":\"set\",\"weight_scale_factor\":"));
+  Serial.print(g_weightScaleFactor, 4);
+  Serial.println(F("}"));
+}
+
+static void calSetWeightOffset(const char* valueStr) {
+  if (!valueStr || *valueStr == '\0') {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing value\"}"));
+    return;
+  }
+  float val = atof(valueStr);
+  if (val < -1000000.0f || val > 1000000.0f) {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"value out of range\"}"));
+    return;
+  }
+  g_weightOffset = val;
+  weightSensor.set_offset(static_cast<long>(g_weightOffset));
+  Serial.print(F("{\"type\":\"calibration\",\"status\":\"set\",\"weight_offset\":"));
+  Serial.print(g_weightOffset, 2);
   Serial.println(F("}"));
 }
 
@@ -147,6 +183,23 @@ static void handleCalCommand(const char* rest) {
       } else {
         Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"unknown temp param\"}"));
       }
+    } else if (strcmp(target, "WEIGHT") == 0) {
+      static char kind[16];
+      i = 0;
+      while (*rest && *rest != ' ' && i < 15) {
+        kind[i++] = static_cast<char>(*rest++);
+      }
+      kind[i] = '\0';
+      while (*rest == ' ') {
+        rest++;
+      }
+      if (strcmp(kind, "SCALE") == 0) {
+        calSetWeightScale(rest);
+      } else if (strcmp(kind, "OFFSET") == 0) {
+        calSetWeightOffset(rest);
+      } else {
+        Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"unknown weight param\"}"));
+      }
     } else {
       Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"unknown set target\"}"));
     }
@@ -156,6 +209,9 @@ static void handleCalCommand(const char* rest) {
     Serial.println(F("'}"));
   }
 }
+
+// ---- Internal: WEIGHT command handler ----
+void measureWeight();
 
 // ---- Command dispatch ----
 void dispatchCommand(const char* cmd) {
@@ -167,6 +223,8 @@ void dispatchCommand(const char* cmd) {
     measureTemperature();
   } else if (strcmp(cmd, "HEART") == 0) {
     measureHeart();
+  } else if (strcmp(cmd, "WEIGHT") == 0) {
+    measureWeight();
   } else if (strcmp(cmd, "CAL") == 0) {
     Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing subcommand\"}"));
   } else if (strncmp(cmd, "CAL ", 4) == 0) {
@@ -174,4 +232,28 @@ void dispatchCommand(const char* cmd) {
   } else {
     Serial.println(F("{\"type\":\"error\",\"status\":\"unknown_command\"}"));
   }
+}
+
+// ---- WEIGHT command ----
+void measureWeight() {
+  if (!g_weightReady) {
+    Serial.println(F("{\"type\":\"weight\",\"status\":\"sensor_error\"}"));
+    return;
+  }
+
+  float weight = readWeightKg(WEIGHT_SAMPLES);
+  if (weight == -999.0f) {
+    Serial.println(F("{\"type\":\"weight\",\"status\":\"read_error\"}"));
+    return;
+  }
+
+  long raw = weightSensor.read();
+
+  Serial.print(F("{\"type\":\"weight\",\"status\":\"success\",\"weight_kg\":"));
+  Serial.print(weight, 2);
+  Serial.print(F(",\"raw\":"));
+  Serial.print(raw);
+  Serial.print(F(",\"samples\":"));
+  Serial.print(WEIGHT_SAMPLES);
+  Serial.println(F("}"));
 }

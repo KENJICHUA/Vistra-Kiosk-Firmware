@@ -54,4 +54,16 @@ static constexpr byte   MIN_VALID_HEART_WINDOWS     = 3;
 // Command buffer
 static constexpr size_t kCmdBufferSize = 32;
 
+// ---- HX711 weight sensor settings ----
+// HX711 uses two digital GPIO pins (not I2C).
+static constexpr uint8_t HX711_DOUT_PIN = 48;
+static constexpr uint8_t HX711_SCK_PIN  = 49;
+
+// Weight calibration factory defaults. Persisted in EEPROM via CAL SET WEIGHT ...
+static constexpr float  DEFAULT_WEIGHT_SCALE_FACTOR = 1.0f; // raw units per kg
+static constexpr float  DEFAULT_WEIGHT_OFFSET       = 0.0f;  // tare raw value
+static constexpr byte   WEIGHT_SAMPLES              = 10;    // samples to average
+static constexpr float  MIN_WEIGHT_KG               = -5.0f;
+static constexpr float  MAX_WEIGHT_KG               = 500.0f;
+
 #endif // VISTRA_CONFIG_H

@@ -1,4 +1,5 @@
 #include "sensors.h"
+#include "weight.h"
 
 // ---- Shared sensor objects (actual storage) ----
 Adafruit_VL53L1X vl53l1x;
@@ -49,7 +50,10 @@ bool initSensors() {
     Serial.println(F("MAX30102 NOT FOUND"));
   }
 
-  return g_tofReady && g_heartReady && g_mlxReady;
+  // HX711 weight sensor
+  initWeightSensor();
+
+  return g_tofReady && g_heartReady && g_mlxReady && g_weightReady;
 }
 
 // ---- MLX90614 read (direct I2C with PEC byte) ----
