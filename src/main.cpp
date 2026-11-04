@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "sensors.h"
+#include "calibration.h"
 #include "serial.h"
 
 // ============================================================
@@ -41,6 +42,7 @@ void setup() {
   Wire.setClock(I2C_CLOCK_HZ); // 100 kHz for shared I2C bus
   delay(100);
 
+  calibrationInit();
   initSensors();
 
   Serial.println();

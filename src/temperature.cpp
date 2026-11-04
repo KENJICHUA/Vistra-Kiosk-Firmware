@@ -89,7 +89,7 @@ void measureTemperature() {
   }
 
   // Temperature calibration
-  float calibratedTemperature = (rawTemperature * TEMP_CAL_SCALE) + TEMP_CAL_OFFSET;
+  float calibratedTemperature = (rawTemperature * g_tempCalScale) + g_tempCalOffset;
 
   // Stability label
   const char* stability;

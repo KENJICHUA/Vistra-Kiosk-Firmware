@@ -14,9 +14,9 @@ static constexpr uint8_t MLX_OBJECT_REG  = 0x07;
 static constexpr uint8_t VL53L1X_ADDR    = 0x29;
 
 // Height settings
-// Replace 215.0 with the ACTUAL distance from VL53L1X sensor face
-// to the top of the standing platform.
-static constexpr float  SENSOR_TO_FLOOR_CM     = 215.0f;
+// Factory default. Replace with calibrated value via CAL SET HEIGHT <cm>.
+// The calibrated value persists in EEPROM and overrides this at runtime.
+static constexpr float  DEFAULT_SENSOR_TO_FLOOR_CM = 215.0f;
 static constexpr byte   HEIGHT_SAMPLES         = 9;
 static constexpr float  HEIGHT_MAX_SPREAD_CM   = 2.0f;
 static constexpr float  MIN_PERSON_HEIGHT_CM   = 80.0f;
@@ -27,8 +27,9 @@ static constexpr byte   HEIGHT_MAX_ATTEMPTS    = 3;
 // Temperature settings
 static constexpr byte   TEMP_SAMPLES       = 9;
 static constexpr float  TEMP_MAX_SPREAD_C  = 0.60f;
-static constexpr float  TEMP_CAL_SCALE     = 1.0f;
-static constexpr float  TEMP_CAL_OFFSET    = 0.0f;
+// Factory defaults. Overridden at runtime by EEPROM calibration.
+static constexpr float  DEFAULT_TEMP_CAL_SCALE = 1.0f;
+static constexpr float  DEFAULT_TEMP_CAL_OFFSET = 0.0f;
 // Ambient/no hand ~30-31 C, hand ~35 C
 static constexpr float  HAND_MIN_DELTA_C   = 1.5f;
 static constexpr unsigned long HAND_WAIT_TIMEOUT   = 10000;

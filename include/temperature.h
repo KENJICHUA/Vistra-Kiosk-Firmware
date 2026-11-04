@@ -2,6 +2,7 @@
 #define VISTRA_TEMPERATURE_H
 
 #include "sensors.h"
+#include "calibration.h"
 #include "config.h"
 #include "array_helpers.h"
 

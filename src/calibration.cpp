@@ -1,0 +1,71 @@
+#include "calibration.h"
+
+// ---- Runtime calibration values (actual storage) ----
+float g_sensorToFloorCm = DEFAULT_SENSOR_TO_FLOOR_CM;
+float g_tempCalScale    = DEFAULT_TEMP_CAL_SCALE;
+float g_tempCalOffset   = DEFAULT_TEMP_CAL_OFFSET;
+
+// ---- Checksum: sum of all bytes except the checksum field itself ----
+static uint16_t computeChecksum(const CalibrationRecord& rec) {
+  const byte* p = reinterpret_cast<const byte*>(&rec);
+  uint16_t sum = 0;
+  size_t n = sizeof(rec) - sizeof(rec.checksum);
+  for (size_t i = 0; i < n; i++) {
+    sum += static_cast<uint16_t>(p[i]);
+  }
+  return sum;
+}
+
+bool calibrationIsValid() {
+  CalibrationRecord rec;
+  EEPROM.get(kEepromAddr, rec);
+  if (rec.magic != kCalMagic || rec.version != kCalVersion) {
+    return false;
+  }
+  return rec.checksum == computeChecksum(rec);
+}
+
+void calibrationInit() {
+  if (calibrationIsValid()) {
+    CalibrationRecord rec;
+    EEPROM.get(kEepromAddr, rec);
+    g_sensorToFloorCm = rec.sensorToFloorCm;
+    g_tempCalScale    = rec.tempCalScale;
+    g_tempCalOffset   = rec.tempCalOffset;
+    Serial.println(F("Calibration loaded from EEPROM"));
+  } else {
+    calibrationReset();
+    Serial.println(F("Calibration: using factory defaults"));
+  }
+}
+
+bool calibrationSave() {
+  CalibrationRecord rec;
+  rec.magic        = kCalMagic;
+  rec.version      = kCalVersion;
+  rec.sensorToFloorCm = g_sensorToFloorCm;
+  rec.tempCalScale    = g_tempCalScale;
+  rec.tempCalOffset   = g_tempCalOffset;
+  rec.checksum     = computeChecksum(rec);
+  EEPROM.put(kEepromAddr, rec);
+  return true;
+}
+
+void calibrationReset() {
+  g_sensorToFloorCm = DEFAULT_SENSOR_TO_FLOOR_CM;
+  g_tempCalScale    = DEFAULT_TEMP_CAL_SCALE;
+  g_tempCalOffset   = DEFAULT_TEMP_CAL_OFFSET;
+}
+
+void calibrationPrint() {
+  Serial.print(F("{\"type\":\"calibration\","));
+  Serial.print(F("\"sensor_to_floor_cm\":"));
+  Serial.print(g_sensorToFloorCm, 2);
+  Serial.print(F(",\"temp_cal_scale\":"));
+  Serial.print(g_tempCalScale, 3);
+  Serial.print(F(",\"temp_cal_offset\":"));
+  Serial.print(g_tempCalOffset, 2);
+  Serial.print(F(",\"eeprom_valid\":"));
+  Serial.print(calibrationIsValid() ? F("true") : F("false"));
+  Serial.println(F("}"));
+}

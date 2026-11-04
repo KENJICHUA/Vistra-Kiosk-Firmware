@@ -6,7 +6,7 @@ static bool personUnderHeightSensor() {
   if (distance <= 0) {
     return false;
   }
-  float calculatedHeight = SENSOR_TO_FLOOR_CM - distance;
+  float calculatedHeight = g_sensorToFloorCm - distance;
   return (calculatedHeight >= MIN_PERSON_HEIGHT_CM &&
           calculatedHeight <= MAX_PERSON_HEIGHT_CM);
 }
@@ -60,7 +60,7 @@ void measureHeight() {
     float maxDistance = sortedSamples[HEIGHT_SAMPLES - 1];
     float spread = maxDistance - minDistance;
     float medianDistance = medianFloat(samples, HEIGHT_SAMPLES);
-    float height = SENSOR_TO_FLOOR_CM - medianDistance;
+    float height = g_sensorToFloorCm - medianDistance;
 
     // Height range check
     if (height < MIN_PERSON_HEIGHT_CM || height > MAX_PERSON_HEIGHT_CM) {
