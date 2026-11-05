@@ -17,5 +17,6 @@ extern bool g_weightReady;
 bool initWeightSensor();        // initialize HX711, apply calibration
 float readWeightKg(byte samples = WEIGHT_SAMPLES);  // returns weight in kg, or -999 on error
 bool tareWeight(byte samples = WEIGHT_SAMPLES);     // tare / zero the scale
+void measureWeight();           // WEIGHT command handler (JSON output)
 
 #endif // VISTRA_WEIGHT_H

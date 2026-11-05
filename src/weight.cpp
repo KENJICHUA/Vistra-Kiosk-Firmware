@@ -59,3 +59,27 @@ bool tareWeight(byte samples) {
 
   return true;
 }
+
+// ---- WEIGHT command ----
+void measureWeight() {
+  if (!g_weightReady) {
+    Serial.println(F("{\"type\":\"weight\",\"status\":\"sensor_error\"}"));
+    return;
+  }
+
+  float weight = readWeightKg(WEIGHT_SAMPLES);
+  if (weight == -999.0f) {
+    Serial.println(F("{\"type\":\"weight\",\"status\":\"read_error\"}"));
+    return;
+  }
+
+  long raw = weightSensor.read();
+
+  Serial.print(F("{\"type\":\"weight\",\"status\":\"success\",\"weight_kg\":"));
+  Serial.print(weight, 2);
+  Serial.print(F(",\"raw\":"));
+  Serial.print(raw);
+  Serial.print(F(",\"samples\":"));
+  Serial.print(WEIGHT_SAMPLES);
+  Serial.println(F("}"));
+}
