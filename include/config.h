@@ -1,7 +1,8 @@
 #ifndef VISTRA_CONFIG_H
 #define VISTRA_CONFIG_H
 
-#include <Arduino.h>
+#include <stdint.h>
+#include <stddef.h>
 
 // Serial
 static constexpr uint32_t BAUD_RATE       = 115200;
@@ -17,15 +18,15 @@ static constexpr uint8_t VL53L1X_ADDR    = 0x29;
 // Factory default. Replace with calibrated value via CAL SET HEIGHT <cm>.
 // The calibrated value persists in EEPROM and overrides this at runtime.
 static constexpr float  DEFAULT_SENSOR_TO_FLOOR_CM = 215.0f;
-static constexpr byte   HEIGHT_SAMPLES         = 9;
+static constexpr uint8_t HEIGHT_SAMPLES         = 9;
 static constexpr float  HEIGHT_MAX_SPREAD_CM   = 2.0f;
 static constexpr float  MIN_PERSON_HEIGHT_CM   = 80.0f;
 static constexpr float  MAX_PERSON_HEIGHT_CM   = 220.0f;
 static constexpr unsigned long HEIGHT_WAIT_TIMEOUT = 10000;
-static constexpr byte   HEIGHT_MAX_ATTEMPTS    = 3;
+static constexpr uint8_t HEIGHT_MAX_ATTEMPTS    = 3;
 
 // Temperature settings
-static constexpr byte   TEMP_SAMPLES       = 9;
+static constexpr uint8_t TEMP_SAMPLES       = 9;
 static constexpr float  TEMP_MAX_SPREAD_C  = 0.60f;
 // Factory defaults. Overridden at runtime by EEPROM calibration.
 static constexpr float  DEFAULT_TEMP_CAL_SCALE = 1.0f;
@@ -36,10 +37,10 @@ static constexpr unsigned long HAND_WAIT_TIMEOUT   = 10000;
 static constexpr unsigned long HAND_STABILIZE_MS   = 1500;
 
 // Heart / SpO2 settings
-static constexpr byte   HEART_BUFFER_SIZE = 100;
+static constexpr uint8_t HEART_BUFFER_SIZE = 100;
 static constexpr uint32_t FINGER_THRESHOLD          = 50000;
 static constexpr uint32_t FINGER_REMOVED_THRESHOLD  = 30000;
-static constexpr byte   HEART_WINDOWS               = 5;
+static constexpr uint8_t HEART_WINDOWS               = 5;
 static constexpr int    MIN_BPM                     = 40;
 static constexpr int    MAX_BPM                     = 200;
 static constexpr int    MIN_SPO2                    = 80;
@@ -49,7 +50,7 @@ static constexpr int    SPO2_MAX_SPREAD             = 4;
 // Outlier rejection
 static constexpr int    BPM_OUTLIER_LIMIT           = 15;
 static constexpr int    SPO2_OUTLIER_LIMIT          = 4;
-static constexpr byte   MIN_VALID_HEART_WINDOWS     = 3;
+static constexpr uint8_t MIN_VALID_HEART_WINDOWS     = 3;
 
 // Command buffer
 static constexpr size_t kCmdBufferSize = 32;
@@ -62,7 +63,7 @@ static constexpr uint8_t HX711_SCK_PIN  = 49;
 // Weight calibration factory defaults. Persisted in EEPROM via CAL SET WEIGHT ...
 static constexpr float  DEFAULT_WEIGHT_SCALE_FACTOR = 1.0f; // raw units per kg
 static constexpr float  DEFAULT_WEIGHT_OFFSET       = 0.0f;  // tare raw value
-static constexpr byte   WEIGHT_SAMPLES              = 10;    // samples to average
+static constexpr uint8_t WEIGHT_SAMPLES              = 10;    // samples to average
 static constexpr float  MIN_WEIGHT_KG               = -5.0f;
 static constexpr float  MAX_WEIGHT_KG               = 500.0f;
 

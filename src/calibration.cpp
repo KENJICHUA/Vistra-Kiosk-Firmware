@@ -8,15 +8,7 @@ float g_weightScaleFactor = DEFAULT_WEIGHT_SCALE_FACTOR;
 float g_weightOffset     = DEFAULT_WEIGHT_OFFSET;
 
 // ---- Checksum: sum of all bytes except the checksum field itself ----
-static uint16_t computeChecksum(const CalibrationRecord& rec) {
-  const byte* p = reinterpret_cast<const byte*>(&rec);
-  uint16_t sum = 0;
-  size_t n = sizeof(rec) - sizeof(rec.checksum);
-  for (size_t i = 0; i < n; i++) {
-    sum += static_cast<uint16_t>(p[i]);
-  }
-  return sum;
-}
+// (defined as static inline in calibration.h for testability)
 
 bool calibrationIsValid() {
   CalibrationRecord rec;

@@ -1,7 +1,7 @@
 #include "height.h"
 
 // ---- Internal: person-under-sensor detection ----
-static bool personUnderHeightSensor() {
+bool personUnderHeightSensor() {
   float distance = readDistanceCM();
   if (distance <= 0) {
     return false;

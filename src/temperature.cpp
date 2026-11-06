@@ -1,7 +1,7 @@
 #include "temperature.h"
 
 // ---- Internal: hand detection ----
-static bool detectHand(float& ambient, float& objectTemp) {
+bool detectHand(float& ambient, float& objectTemp) {
   ambient = readMLXTemperature(MLX_AMBIENT_REG);
   objectTemp = readMLXTemperature(MLX_OBJECT_REG);
   if (ambient == -999.0f || objectTemp == -999.0f) {

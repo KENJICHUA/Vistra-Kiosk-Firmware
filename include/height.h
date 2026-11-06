@@ -6,6 +6,9 @@
 #include "config.h"
 #include "array_helpers.h"
 
+// ---- Test hooks (pure functions, no hardware) ----
+bool personUnderHeightSensor();
+
 void measureHeight();
 
 #endif // VISTRA_HEIGHT_H

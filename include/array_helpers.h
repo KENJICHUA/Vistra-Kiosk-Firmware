@@ -1,12 +1,15 @@
 #ifndef VISTRA_ARRAY_HELPERS_H
 #define VISTRA_ARRAY_HELPERS_H
 
+#include <stdint.h>
+#include <stddef.h>
+
 #include "config.h"
 
 // Sorts `count` floats in ascending order (bubble sort, small N).
-static inline void sortFloatArray(float arr[], byte count) {
-  for (byte i = 0; i < count - 1; i++) {
-    for (byte j = i + 1; j < count; j++) {
+static inline void sortFloatArray(float arr[], uint8_t count) {
+  for (uint8_t i = 0; i < count - 1; i++) {
+    for (uint8_t j = i + 1; j < count; j++) {
       if (arr[j] < arr[i]) {
         float temp = arr[i];
         arr[i] = arr[j];
@@ -17,9 +20,9 @@ static inline void sortFloatArray(float arr[], byte count) {
 }
 
 // Sorts `count` ints in ascending order (bubble sort, small N).
-static inline void sortIntArray(int arr[], byte count) {
-  for (byte i = 0; i < count - 1; i++) {
-    for (byte j = i + 1; j < count; j++) {
+static inline void sortIntArray(int arr[], uint8_t count) {
+  for (uint8_t i = 0; i < count - 1; i++) {
+    for (uint8_t j = i + 1; j < count; j++) {
       if (arr[j] < arr[i]) {
         int temp = arr[i];
         arr[i] = arr[j];
@@ -30,12 +33,12 @@ static inline void sortIntArray(int arr[], byte count) {
 }
 
 // Returns the median of `count` floats. `copy` capped at 20 elements.
-static inline float medianFloat(float arr[], byte count) {
+static inline float medianFloat(float arr[], uint8_t count) {
   float copy[20];
   if (count > 20) {
     count = 20;
   }
-  for (byte i = 0; i < count; i++) {
+  for (uint8_t i = 0; i < count; i++) {
     copy[i] = arr[i];
   }
   sortFloatArray(copy, count);
@@ -46,12 +49,12 @@ static inline float medianFloat(float arr[], byte count) {
 }
 
 // Returns the median of `count` ints. `copy` capped at 20 elements.
-static inline int medianInt(int arr[], byte count) {
+static inline int medianInt(int arr[], uint8_t count) {
   int copy[20];
   if (count > 20) {
     count = 20;
   }
-  for (byte i = 0; i < count; i++) {
+  for (uint8_t i = 0; i < count; i++) {
     copy[i] = arr[i];
   }
   sortIntArray(copy, count);
