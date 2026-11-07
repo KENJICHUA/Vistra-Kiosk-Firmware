@@ -15,6 +15,7 @@
 #include "../include/array_helpers.h"
 #include "../include/calibration.h"
 #include "../include/config.h"
+#include "../include/test.h"
 
 // ---- Host mocks for Arduino-only symbols ----
 float g_sensorToFloorCm  = DEFAULT_SENSOR_TO_FLOOR_CM;
@@ -397,6 +398,100 @@ void test_weightInRange_normal() {
 }
 
 /*======================================================================
+  TEST COMMAND PROTOCOL
+======================================================================*/
+
+void test_testTofTimeoutPositive() {
+  TEST_ASSERT_TRUE(TEST_TOF_TIMEOUT_MS > 0);
+}
+
+void test_testTempTimeoutPositive() {
+  TEST_ASSERT_TRUE(TEST_TEMP_TIMEOUT_MS > 0);
+}
+
+void test_testHeartTimeoutPositive() {
+  TEST_ASSERT_TRUE(TEST_HEART_TIMEOUT_MS > 0);
+}
+
+void test_testWeightTimeoutPositive() {
+  TEST_ASSERT_TRUE(TEST_WEIGHT_TIMEOUT_MS > 0);
+}
+
+void test_testDistanceRangeValid() {
+  TEST_ASSERT_TRUE(TEST_DISTANCE_MAX_CM > TEST_DISTANCE_MIN_CM);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 1.0f, TEST_DISTANCE_MIN_CM);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 500.0f, TEST_DISTANCE_MAX_CM);
+}
+
+void test_testTempRangeValid() {
+  TEST_ASSERT_TRUE(TEST_TEMP_MAX_C > TEST_TEMP_MIN_C);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 20.0f, TEST_TEMP_MIN_C);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 45.0f, TEST_TEMP_MAX_C);
+}
+
+void test_testAmbientRangeValid() {
+  TEST_ASSERT_TRUE(TEST_AMBIENT_MAX_C > TEST_AMBIENT_MIN_C);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 10.0f, TEST_AMBIENT_MIN_C);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 40.0f, TEST_AMBIENT_MAX_C);
+}
+
+void test_isValidTofDistance_inRange() {
+  TEST_ASSERT_TRUE(isValidTofDistance(100.0f));
+  TEST_ASSERT_TRUE(isValidTofDistance(1.0f));
+  TEST_ASSERT_TRUE(isValidTofDistance(500.0f));
+}
+
+void test_isValidTofDistance_outOfRangeLow() {
+  TEST_ASSERT_FALSE(isValidTofDistance(0.0f));
+  TEST_ASSERT_FALSE(isValidTofDistance(0.5f));
+  TEST_ASSERT_FALSE(isValidTofDistance(-10.0f));
+}
+
+void test_isValidTofDistance_outOfRangeHigh() {
+  TEST_ASSERT_FALSE(isValidTofDistance(500.1f));
+  TEST_ASSERT_FALSE(isValidTofDistance(600.0f));
+}
+
+void test_isValidTempReading_valid() {
+  TEST_ASSERT_TRUE(isValidTempReading(30.0f, 35.0f));
+  TEST_ASSERT_TRUE(isValidTempReading(20.0f, 20.0f));
+  TEST_ASSERT_TRUE(isValidTempReading(40.0f, 45.0f));
+}
+
+void test_isValidTempReading_tooCold() {
+  TEST_ASSERT_FALSE(isValidTempReading(5.0f, 35.0f));
+  TEST_ASSERT_FALSE(isValidTempReading(30.0f, 10.0f));
+}
+
+void test_isValidTempReading_tooHot() {
+  TEST_ASSERT_FALSE(isValidTempReading(50.0f, 35.0f));
+  TEST_ASSERT_FALSE(isValidTempReading(30.0f, 50.0f));
+}
+
+void test_isValidTempReading_invalidValues() {
+  TEST_ASSERT_FALSE(isValidTempReading(-999.0f, 35.0f));
+  TEST_ASSERT_FALSE(isValidTempReading(30.0f, -999.0f));
+  TEST_ASSERT_FALSE(isValidTempReading(-999.0f, -999.0f));
+}
+
+void test_isValidWeightKg_valid() {
+  TEST_ASSERT_TRUE(isValidWeightKg(0.0f));
+  TEST_ASSERT_TRUE(isValidWeightKg(75.0f));
+  TEST_ASSERT_TRUE(isValidWeightKg(-5.0f));
+  TEST_ASSERT_TRUE(isValidWeightKg(500.0f));
+}
+
+void test_isValidWeightKg_outOfRange() {
+  TEST_ASSERT_FALSE(isValidWeightKg(-999.0f));
+  TEST_ASSERT_FALSE(isValidWeightKg(-5.1f));
+  TEST_ASSERT_FALSE(isValidWeightKg(500.1f));
+}
+
+void test_isValidWeightKg_invalidErrorValue() {
+  TEST_ASSERT_FALSE(isValidWeightKg(-999.0f));
+}
+
+/*======================================================================
   RUNNER
 ======================================================================*/
 
@@ -470,6 +565,25 @@ int main(int argc, char **argv) {
   RUN_TEST(test_weightOutOfRange_low);
   RUN_TEST(test_weightOutOfRange_high);
   RUN_TEST(test_weightInRange_normal);
+
+  /* TEST command protocol */
+  RUN_TEST(test_testTofTimeoutPositive);
+  RUN_TEST(test_testTempTimeoutPositive);
+  RUN_TEST(test_testHeartTimeoutPositive);
+  RUN_TEST(test_testWeightTimeoutPositive);
+  RUN_TEST(test_testDistanceRangeValid);
+  RUN_TEST(test_testTempRangeValid);
+  RUN_TEST(test_testAmbientRangeValid);
+  RUN_TEST(test_isValidTofDistance_inRange);
+  RUN_TEST(test_isValidTofDistance_outOfRangeLow);
+  RUN_TEST(test_isValidTofDistance_outOfRangeHigh);
+  RUN_TEST(test_isValidTempReading_valid);
+  RUN_TEST(test_isValidTempReading_tooCold);
+  RUN_TEST(test_isValidTempReading_tooHot);
+  RUN_TEST(test_isValidTempReading_invalidValues);
+  RUN_TEST(test_isValidWeightKg_valid);
+  RUN_TEST(test_isValidWeightKg_outOfRange);
+  RUN_TEST(test_isValidWeightKg_invalidErrorValue);
 
   UNITY_END();
   return 0;

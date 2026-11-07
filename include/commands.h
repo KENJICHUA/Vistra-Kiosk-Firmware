@@ -11,6 +11,7 @@
 #include "temperature.h"
 #include "heart.h"
 #include "weight.h"
+#include "test.h"
 
 void dispatchCommand(const char* cmd);
 

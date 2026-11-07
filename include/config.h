@@ -67,4 +67,18 @@ static constexpr uint8_t WEIGHT_SAMPLES              = 10;    // samples to aver
 static constexpr float  MIN_WEIGHT_KG               = -5.0f;
 static constexpr float  MAX_WEIGHT_KG               = 500.0f;
 
+// ---- TEST command timeouts ----
+static constexpr unsigned long TEST_TOF_TIMEOUT_MS      = 1000;
+static constexpr unsigned long TEST_TEMP_TIMEOUT_MS     = 2000;
+static constexpr unsigned long TEST_HEART_TIMEOUT_MS    = 5000;
+static constexpr unsigned long TEST_WEIGHT_TIMEOUT_MS   = 1000;
+
+// ---- TEST validation ranges ----
+static constexpr float  TEST_DISTANCE_MIN_CM  = 1.0f;
+static constexpr float  TEST_DISTANCE_MAX_CM  = 500.0f;
+static constexpr float  TEST_TEMP_MIN_C       = 20.0f;
+static constexpr float  TEST_TEMP_MAX_C       = 45.0f;
+static constexpr float  TEST_AMBIENT_MIN_C    = 10.0f;
+static constexpr float  TEST_AMBIENT_MAX_C    = 40.0f;
+
 #endif // VISTRA_CONFIG_H

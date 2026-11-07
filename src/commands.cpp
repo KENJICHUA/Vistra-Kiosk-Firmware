@@ -222,6 +222,10 @@ void dispatchCommand(const char* cmd) {
     measureHeart();
   } else if (strcmp(cmd, "WEIGHT") == 0) {
     measureWeight();
+  } else if (strcmp(cmd, "TEST") == 0) {
+    Serial.println(F("{\"type\":\"test\",\"status\":\"error\",\"message\":\"missing subcommand\"}"));
+  } else if (strncmp(cmd, "TEST ", 5) == 0) {
+    handleTestCommand(cmd + 5);
   } else if (strcmp(cmd, "CAL") == 0) {
     Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing subcommand\"}"));
   } else if (strncmp(cmd, "CAL ", 4) == 0) {

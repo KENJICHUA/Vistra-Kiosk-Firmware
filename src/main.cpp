@@ -51,7 +51,7 @@ void setup() {
 
   Serial.println();
   Serial.println(F("ARDUINO READY"));
-  Serial.println(F("Commands: STATUS HEIGHT TEMP HEART WEIGHT CAL"));
+  Serial.println(F("Commands: STATUS HEIGHT TEMP HEART WEIGHT CAL TEST"));
 }
 
 void loop() {
