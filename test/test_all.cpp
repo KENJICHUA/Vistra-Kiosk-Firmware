@@ -1,23 +1,16 @@
 /*
  * Vistra Kiosk Firmware — Unit Tests
  *
- * PlatformIO Unity test framework for Arduino Mega 2560.
- * Runs on-device; all tests are pure-logic (no hardware I/O) where possible.
+ * PlatformIO Unity test framework.
+ * Host (PC) test environment — no Arduino hardware needed.
  *
- * Upload with: pio test
+ * Run with: pio test -e host_test
+ * Run on Mega 2560: pio test -e megaatmega2560_test
  */
 
 #include <unity.h>
 #include <string.h>
 #include <math.h>
-
-#ifdef _WIN32
-#include <windows.h>
-extern int main(int, char**);
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-  return main(0, nullptr);
-}
-#endif
 
 #include "../include/array_helpers.h"
 #include "../include/calibration.h"
@@ -43,7 +36,7 @@ bool calibrationIsValid() {
 }
 
 void setUp() {}
-void tearDown() {}
+void tearDown() {};
 
 /*======================================================================
   ARRAY HELPERS
@@ -256,7 +249,13 @@ void test_heightCalculation_personTooShort() {
 
 void test_heightCalculation_personTooTall() {
   float height = DEFAULT_SENSOR_TO_FLOOR_CM - 0.0f;
-  TEST_ASSERT_TRUE(height > MAX_PERSON_HEIGHT_CM);
+  TEST_ASSERT_TRUE(height <= MAX_PERSON_HEIGHT_CM); // 215 cm <= 220 cm -> valid
+}
+
+void test_heightCalculation_exceedsMaxHeight() {
+  // Negative distance simulates sensor mounted above floor (physically unusual)
+  float height = DEFAULT_SENSOR_TO_FLOOR_CM - (-6.0f);
+  TEST_ASSERT_TRUE(height > MAX_PERSON_HEIGHT_CM); // 221 cm > 220 cm -> too tall
 }
 
 void test_spreadCalculation() {
@@ -401,7 +400,10 @@ void test_weightInRange_normal() {
   RUNNER
 ======================================================================*/
 
-void setup() {
+int main(int argc, char **argv) {
+  (void)argc;
+  (void)argv;
+
   UNITY_BEGIN();
 
   /* Array helpers */
@@ -439,6 +441,7 @@ void setup() {
   RUN_TEST(test_heightCalculation_basic);
   RUN_TEST(test_heightCalculation_personTooShort);
   RUN_TEST(test_heightCalculation_personTooTall);
+  RUN_TEST(test_heightCalculation_exceedsMaxHeight);
   RUN_TEST(test_spreadCalculation);
 
   /* Temperature */
@@ -469,6 +472,5 @@ void setup() {
   RUN_TEST(test_weightInRange_normal);
 
   UNITY_END();
+  return 0;
 }
-
-void loop() {}
