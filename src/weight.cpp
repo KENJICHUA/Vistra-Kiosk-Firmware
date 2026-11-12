@@ -18,7 +18,7 @@ bool initWeightSensor() {
 
   // Quick sanity read: if the sensor responds, mark ready
   long raw = weightSensor.read();
-  if (raw == 0) {
+  if (raw <= 0) {
     Serial.println(F("HX711 NOT FOUND"));
     g_weightReady = false;
     return false;
@@ -37,8 +37,9 @@ float readWeightKg(byte samples) {
 
   float weight = weightSensor.get_units(samples);
 
-  // Sanity check
-  if (weight < MIN_WEIGHT_KG || weight > MAX_WEIGHT_KG) {
+  // Sanity check: reject -1 (disconnected sensor) and out-of-range values.
+  // Slight negative drift after tare is allowed (down to -2.0 kg).
+  if (weight < -2.0f || weight > MAX_WEIGHT_KG) {
     return -999.0f;
   }
 
@@ -74,6 +75,11 @@ void measureWeight() {
   }
 
   long raw = weightSensor.read();
+
+  if (raw <= 0) {
+    Serial.println(F("{\"type\":\"weight\",\"status\":\"read_error\"}"));
+    return;
+  }
 
   Serial.print(F("{\"type\":\"weight\",\"status\":\"success\",\"weight_kg\":"));
   Serial.print(weight, 2);

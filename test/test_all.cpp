@@ -282,7 +282,7 @@ void test_tempCalDefaults() {
 
 void test_handDeltaPositive() {
   TEST_ASSERT_TRUE(HAND_MIN_DELTA_C > 0.0f);
-  TEST_ASSERT_FLOAT_WITHIN(0.001f, 1.5f, HAND_MIN_DELTA_C);
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.5f, HAND_MIN_DELTA_C);
 }
 
 void test_tempSamplesPositive() {
@@ -317,15 +317,22 @@ void test_handDetectionDelta_aboveThreshold() {
 }
 
 void test_handDetectionDelta_belowThreshold() {
-  float delta = 31.0f - 30.0f;
-  TEST_ASSERT_FLOAT_WITHIN(0.001f, 1.0f, delta);
+  float delta = 30.3f - 30.0f;
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.3f, delta);
   TEST_ASSERT_TRUE(delta < HAND_MIN_DELTA_C);
 }
 
 void test_handDetectionDelta_exactlyAtThreshold() {
-  float delta = 31.5f - 30.0f;
-  TEST_ASSERT_FLOAT_WITHIN(0.001f, 1.5f, delta);
+  float delta = 30.5f - 30.0f;
+  TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.5f, delta);
   TEST_ASSERT_TRUE(delta >= HAND_MIN_DELTA_C);
+}
+
+void test_isValidTempReading_fireRejected() {
+  // Fire/extreme heat: delta far exceeds HAND_MAX_DELTA_C
+  TEST_ASSERT_FALSE(isValidTempReading(30.0f, 200.0f));
+  TEST_ASSERT_FALSE(isValidTempReading(25.0f, 150.0f));
+  TEST_ASSERT_FALSE(isValidTempReading(30.0f, 100.0f));
 }
 
 void test_tempSpreadStable() {
@@ -477,13 +484,13 @@ void test_isValidTempReading_invalidValues() {
 void test_isValidWeightKg_valid() {
   TEST_ASSERT_TRUE(isValidWeightKg(0.0f));
   TEST_ASSERT_TRUE(isValidWeightKg(75.0f));
-  TEST_ASSERT_TRUE(isValidWeightKg(-5.0f));
+  TEST_ASSERT_TRUE(isValidWeightKg(-2.0f));
   TEST_ASSERT_TRUE(isValidWeightKg(500.0f));
 }
 
 void test_isValidWeightKg_outOfRange() {
   TEST_ASSERT_FALSE(isValidWeightKg(-999.0f));
-  TEST_ASSERT_FALSE(isValidWeightKg(-5.1f));
+  TEST_ASSERT_FALSE(isValidWeightKg(-2.1f));
   TEST_ASSERT_FALSE(isValidWeightKg(500.1f));
 }
 
@@ -581,6 +588,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_isValidTempReading_tooCold);
   RUN_TEST(test_isValidTempReading_tooHot);
   RUN_TEST(test_isValidTempReading_invalidValues);
+  RUN_TEST(test_isValidTempReading_fireRejected);
   RUN_TEST(test_isValidWeightKg_valid);
   RUN_TEST(test_isValidWeightKg_outOfRange);
   RUN_TEST(test_isValidWeightKg_invalidErrorValue);

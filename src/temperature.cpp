@@ -8,6 +8,10 @@ bool detectHand(float& ambient, float& objectTemp) {
     return false;
   }
   float difference = objectTemp - ambient;
+  // Reject fire/extreme heat (delta too large = not a hand)
+  if (difference > HAND_MAX_DELTA_C) {
+    return false;
+  }
   return difference >= HAND_MIN_DELTA_C;
 }
 
@@ -59,7 +63,8 @@ void measureTemperature() {
       Serial.println(F("{\"type\":\"temperature\",\"status\":\"read_error\"}"));
       return;
     }
-    if (currentObject - currentAmbient < HAND_MIN_DELTA_C) {
+    float difference = currentObject - currentAmbient;
+    if (difference < HAND_MIN_DELTA_C || difference > HAND_MAX_DELTA_C) {
       Serial.println(F("{\"type\":\"temperature\",\"status\":\"hand_removed\"}"));
       return;
     }

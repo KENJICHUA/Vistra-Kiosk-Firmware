@@ -32,7 +32,8 @@ static constexpr float  TEMP_MAX_SPREAD_C  = 0.60f;
 static constexpr float  DEFAULT_TEMP_CAL_SCALE = 1.0f;
 static constexpr float  DEFAULT_TEMP_CAL_OFFSET = 0.0f;
 // Ambient/no hand ~30-31 C, hand ~35 C
-static constexpr float  HAND_MIN_DELTA_C   = 1.5f;
+static constexpr float  HAND_MIN_DELTA_C   = 0.5f;  // lower = more sensitive
+static constexpr float  HAND_MAX_DELTA_C   = 15.0f; // above this = fire/extreme heat, not hand
 static constexpr unsigned long HAND_WAIT_TIMEOUT   = 10000;
 static constexpr unsigned long HAND_STABILIZE_MS   = 1500;
 

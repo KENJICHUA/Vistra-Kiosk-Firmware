@@ -38,6 +38,10 @@ static inline bool isValidTempReading(float ambient, float objectTemp) {
   if (objectTemp < TEST_TEMP_MIN_C || objectTemp > TEST_TEMP_MAX_C) {
     return false;
   }
+  float delta = objectTemp - ambient;
+  if (delta > HAND_MAX_DELTA_C) {
+    return false;
+  }
   return true;
 }
 
@@ -45,7 +49,7 @@ static inline bool isValidWeightKg(float weightKg) {
   if (weightKg == -999.0f) {
     return false;
   }
-  if (weightKg < MIN_WEIGHT_KG || weightKg > MAX_WEIGHT_KG) {
+  if (weightKg < -2.0f || weightKg > MAX_WEIGHT_KG) {
     return false;
   }
   return true;

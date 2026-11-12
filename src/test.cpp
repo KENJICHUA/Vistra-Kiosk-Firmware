@@ -134,8 +134,8 @@ TestResult testWeight() {
 
   long raw = weightSensor.read();
 
-  if (raw == 0) {
-    return {TEST_FAIL, (float)raw, "weight read returned zero"};
+  if (raw <= 0) {
+    return {TEST_FAIL, (float)raw, "weight sensor not connected"};
   }
 
   float weightKg = readWeightKg(WEIGHT_SAMPLES);
