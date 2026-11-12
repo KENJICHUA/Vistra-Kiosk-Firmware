@@ -82,4 +82,8 @@ static constexpr float  TEST_TEMP_MAX_C       = 45.0f;
 static constexpr float  TEST_AMBIENT_MIN_C    = 10.0f;
 static constexpr float  TEST_AMBIENT_MAX_C    = 40.0f;
 
+// ---- RESCAN / hot-swap settings ----
+static constexpr unsigned long RESCAN_INTERVAL_MS = 5000; // auto-rescan every 5s
+static constexpr unsigned long RESCAN_I2C_TIMEOUT_MS = 500; // per-device I2C probe
+
 #endif // VISTRA_CONFIG_H

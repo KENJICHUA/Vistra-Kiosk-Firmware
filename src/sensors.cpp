@@ -10,8 +10,8 @@ bool g_tofReady  = false;
 bool g_heartReady = false;
 bool g_mlxReady  = false;
 
-// ---- Internal helper ----
-static bool i2cDeviceExists(uint8_t address) {
+// ---- I2C device probe (public for rescan) ----
+bool i2cDeviceExists(uint8_t address) {
   Wire.beginTransmission(address);
   return Wire.endTransmission() == 0;
 }
@@ -95,4 +95,84 @@ float readDistanceCM() {
     return -1.0f;
   }
   return distanceMM / 10.0f;
+}
+
+// ---- Per-sensor re-initialisation ----
+
+bool reinitTof() {
+  Serial.println(F("Re-initializing VL53L1X..."));
+  if (vl53l1x.begin(VL53L1X_ADDR, &Wire)) {
+    if (vl53l1x.startRanging()) {
+      vl53l1x.setTimingBudget(100);
+      g_tofReady = true;
+      Serial.println(F("VL53L1X READY"));
+      return true;
+    }
+  }
+  g_tofReady = false;
+  Serial.println(F("VL53L1X NOT FOUND"));
+  return false;
+}
+
+bool reinitMlx() {
+  Serial.println(F("Re-initializing MLX90614..."));
+  g_mlxReady = i2cDeviceExists(MLX90614_ADDR);
+  Serial.println(g_mlxReady ? F("MLX90614 READY") : F("MLX90614 NOT FOUND"));
+  return g_mlxReady;
+}
+
+bool reinitHeart() {
+  Serial.println(F("Re-initializing MAX30102..."));
+  if (max30102.begin(Wire, I2C_SPEED_STANDARD)) {
+    max30102.setup(0x2A, 4, 2, 100, 411, 4096);
+    max30102.setPulseAmplitudeRed(0x2A);
+    max30102.setPulseAmplitudeIR(0x2A);
+    max30102.setPulseAmplitudeGreen(0);
+    g_heartReady = true;
+    Serial.println(F("MAX30102 READY"));
+    return true;
+  }
+  g_heartReady = false;
+  Serial.println(F("MAX30102 NOT FOUND"));
+  return false;
+}
+
+bool reinitWeight() {
+  Serial.println(F("Re-initializing HX711 weight sensor..."));
+  weightSensor.begin(HX711_DOUT_PIN, HX711_SCK_PIN);
+  weightSensor.set_scale(g_weightScaleFactor);
+  weightSensor.set_offset(static_cast<long>(g_weightOffset));
+  long raw = weightSensor.read();
+  if (raw <= 0) {
+    g_weightReady = false;
+    Serial.println(F("HX711 NOT FOUND"));
+    return false;
+  }
+  g_weightReady = true;
+  Serial.println(F("HX711 READY"));
+  return true;
+}
+
+// ---- Full rescan: re-detect all sensors, update health flags ----
+bool rescanSensors() {
+  Serial.println(F("Rescanning sensors..."));
+  bool anyChanged = false;
+
+  bool oldTof = g_tofReady;
+  bool oldHeart = g_heartReady;
+  bool oldMlx = g_mlxReady;
+  bool oldWeight = g_weightReady;
+
+  reinitTof();
+  reinitMlx();
+  reinitHeart();
+  reinitWeight();
+
+  if (oldTof != g_tofReady) anyChanged = true;
+  if (oldHeart != g_heartReady) anyChanged = true;
+  if (oldMlx != g_mlxReady) anyChanged = true;
+  if (oldWeight != g_weightReady) anyChanged = true;
+
+  Serial.println(F("Rescan complete."));
+  return anyChanged;
 }

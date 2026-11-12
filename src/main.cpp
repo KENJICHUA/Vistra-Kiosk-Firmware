@@ -1,5 +1,5 @@
 /*
- * Vistra Kiosk Firmware — Arduino Mega 2560 (V6 port)
+ * Vistra Kiosk Firmware — Arduino Mega 2560 (V7 port)
  *
  * I2C: SDA -> Pin 20, SCL -> Pin 21
  * HX711: DOUT -> Pin 48, SCK -> Pin 49
@@ -17,6 +17,8 @@
  *   HEART   — finger detection + BPM/SpO2 (JSON)
  *   WEIGHT  — weight measurement (JSON)
  *   CAL     — calibration management (SHOW/SET/SAVE/LOAD/RESET)
+ *   TEST    — sensor self-test (ALL/TOF/TEMP/HEART/WEIGHT/CAL)
+ *   RESCAN  — hot-swap: re-detect and re-init all sensors
  *
  * This file is the thin orchestrator: setup() + loop() only.
  * All command logic lives in feature modules under src/.
@@ -39,7 +41,7 @@ void setup() {
   delay(1000);
 
   Serial.println();
-  Serial.println(F("VISTRA SENSOR SYSTEM V6"));
+  Serial.println(F("VISTRA SENSOR SYSTEM V7"));
   Serial.println(F("-----------------------"));
 
   Wire.begin();
@@ -51,9 +53,18 @@ void setup() {
 
   Serial.println();
   Serial.println(F("ARDUINO READY"));
-  Serial.println(F("Commands: STATUS HEIGHT TEMP HEART WEIGHT CAL TEST"));
+  Serial.println(F("Commands: STATUS HEIGHT TEMP HEART WEIGHT CAL TEST RESCAN"));
 }
 
 void loop() {
+  static unsigned long lastRescan = 0;
+  unsigned long now = millis();
+
+  // Auto-rescan sensors periodically for hot-swap support
+  if (now - lastRescan >= RESCAN_INTERVAL_MS) {
+    lastRescan = now;
+    rescanSensors();
+  }
+
   processSerial();
 }

@@ -230,6 +230,11 @@ void dispatchCommand(const char* cmd) {
     Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing subcommand\"}"));
   } else if (strncmp(cmd, "CAL ", 4) == 0) {
     handleCalCommand(cmd + 4);
+  } else if (strcmp(cmd, "RESCAN") == 0) {
+    bool changed = rescanSensors();
+    Serial.print(F("{\"type\":\"rescan\",\"status\":\"success\",\"changed\":"));
+    Serial.print(changed ? F("true") : F("false"));
+    Serial.println(F("}"));
   } else {
     Serial.println(F("{\"type\":\"error\",\"status\":\"unknown_command\"}"));
   }
