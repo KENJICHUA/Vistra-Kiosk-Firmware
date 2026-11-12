@@ -68,6 +68,10 @@ static constexpr uint8_t WEIGHT_SAMPLES              = 10;    // samples to aver
 static constexpr float  MIN_WEIGHT_KG               = -5.0f;
 static constexpr float  MAX_WEIGHT_KG               = 500.0f;
 
+// Heart calibration factory defaults
+static constexpr float  DEFAULT_HEART_CAL_SCALE     = 1.0f; // multiply measured BPM
+static constexpr float  DEFAULT_HEART_CAL_OFFSET    = 0.0f; // add to measured BPM
+
 // ---- TEST command timeouts ----
 static constexpr unsigned long TEST_TOF_TIMEOUT_MS      = 1000;
 static constexpr unsigned long TEST_TEMP_TIMEOUT_MS     = 2000;

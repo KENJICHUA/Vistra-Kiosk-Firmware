@@ -17,11 +17,13 @@ extern float g_tempCalScale;
 extern float g_tempCalOffset;
 extern float g_weightScaleFactor;
 extern float g_weightOffset;
+extern float g_heartCalScale;
+extern float g_heartCalOffset;
 
 // ---- EEPROM layout ----
 static constexpr int kEepromAddr = 0;
 static constexpr uint16_t kCalMagic = 0x4B43;   // "KC"
-static constexpr uint8_t kCalVersion = 2;        // v2 adds weight calibration
+static constexpr uint8_t kCalVersion = 3;        // v3 adds heart calibration
 
 struct CalibrationRecord {
   uint16_t magic;
@@ -31,6 +33,8 @@ struct CalibrationRecord {
   float    tempCalOffset;
   float    weightScaleFactor;
   float    weightOffset;
+  float    heartCalScale;
+  float    heartCalOffset;
   uint16_t checksum;
 };
 

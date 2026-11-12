@@ -6,6 +6,8 @@ float g_tempCalScale     = DEFAULT_TEMP_CAL_SCALE;
 float g_tempCalOffset    = DEFAULT_TEMP_CAL_OFFSET;
 float g_weightScaleFactor = DEFAULT_WEIGHT_SCALE_FACTOR;
 float g_weightOffset     = DEFAULT_WEIGHT_OFFSET;
+float g_heartCalScale     = DEFAULT_HEART_CAL_SCALE;
+float g_heartCalOffset    = DEFAULT_HEART_CAL_OFFSET;
 
 // ---- Checksum: sum of all bytes except the checksum field itself ----
 // (defined as static inline in calibration.h for testability)
@@ -28,6 +30,8 @@ void calibrationInit() {
     g_tempCalOffset    = rec.tempCalOffset;
     g_weightScaleFactor = rec.weightScaleFactor;
     g_weightOffset     = rec.weightOffset;
+    g_heartCalScale     = rec.heartCalScale;
+    g_heartCalOffset    = rec.heartCalOffset;
     Serial.println(F("Calibration loaded from EEPROM"));
   } else {
     calibrationReset();
@@ -44,6 +48,8 @@ bool calibrationSave() {
   rec.tempCalOffset   = g_tempCalOffset;
   rec.weightScaleFactor = g_weightScaleFactor;
   rec.weightOffset    = g_weightOffset;
+  rec.heartCalScale   = g_heartCalScale;
+  rec.heartCalOffset  = g_heartCalOffset;
   rec.checksum        = computeChecksum(rec);
   EEPROM.put(kEepromAddr, rec);
   return true;
@@ -55,6 +61,8 @@ void calibrationReset() {
   g_tempCalOffset    = DEFAULT_TEMP_CAL_OFFSET;
   g_weightScaleFactor = DEFAULT_WEIGHT_SCALE_FACTOR;
   g_weightOffset     = DEFAULT_WEIGHT_OFFSET;
+  g_heartCalScale     = DEFAULT_HEART_CAL_SCALE;
+  g_heartCalOffset    = DEFAULT_HEART_CAL_OFFSET;
 }
 
 void calibrationPrint() {
@@ -69,6 +77,10 @@ void calibrationPrint() {
   Serial.print(g_weightScaleFactor, 4);
   Serial.print(F(",\"weight_offset\":"));
   Serial.print(g_weightOffset, 2);
+  Serial.print(F(",\"heart_cal_scale\":"));
+  Serial.print(g_heartCalScale, 3);
+  Serial.print(F(",\"heart_cal_offset\":"));
+  Serial.print(g_heartCalOffset, 2);
   Serial.print(F(",\"eeprom_valid\":"));
   Serial.print(calibrationIsValid() ? F("true") : F("false"));
   Serial.println(F("}"));

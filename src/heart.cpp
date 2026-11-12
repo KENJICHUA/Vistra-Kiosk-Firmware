@@ -1,4 +1,5 @@
 #include "heart.h"
+#include "calibration.h"
 
 // ---- Module-internal sample buffers (800 bytes static RAM) ----
 static uint32_t g_irBuffer[HEART_BUFFER_SIZE];
@@ -200,6 +201,19 @@ void measureHeart() {
   // Final result
   int finalBPM = medianInt(filteredBPM, filteredCount);
   int finalSPO2 = medianInt(filteredSPO2, filteredCount);
+
+  // Apply heart calibration: calibrated = raw * scale + offset
+  int calibratedBPM = static_cast<int>(finalBPM * g_heartCalScale + g_heartCalOffset);
+  int calibratedSPO2 = static_cast<int>(finalSPO2 * g_heartCalScale + g_heartCalOffset);
+
+  // Clamp to valid ranges
+  if (calibratedBPM < MIN_BPM) calibratedBPM = MIN_BPM;
+  if (calibratedBPM > MAX_BPM) calibratedBPM = MAX_BPM;
+  if (calibratedSPO2 < MIN_SPO2) calibratedSPO2 = MIN_SPO2;
+  if (calibratedSPO2 > MAX_SPO2) calibratedSPO2 = MAX_SPO2;
+
+  finalBPM = calibratedBPM;
+  finalSPO2 = calibratedSPO2;
 
   // Stability label
   const char* stability;

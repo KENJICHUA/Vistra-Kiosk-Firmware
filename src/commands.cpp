@@ -101,6 +101,38 @@ static void calSetWeightOffset(const char* valueStr) {
   Serial.println(F("}"));
 }
 
+static void calSetHeartScale(const char* valueStr) {
+  if (!valueStr || *valueStr == '\0') {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing value\"}"));
+    return;
+  }
+  float val = atof(valueStr);
+  if (val < 0.1f || val > 10.0f) {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"value out of range\"}"));
+    return;
+  }
+  g_heartCalScale = val;
+  Serial.print(F("{\"type\":\"calibration\",\"status\":\"set\",\"heart_cal_scale\":"));
+  Serial.print(g_heartCalScale, 3);
+  Serial.println(F("}"));
+}
+
+static void calSetHeartOffset(const char* valueStr) {
+  if (!valueStr || *valueStr == '\0') {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"missing value\"}"));
+    return;
+  }
+  float val = atof(valueStr);
+  if (val < -50.0f || val > 50.0f) {
+    Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"value out of range\"}"));
+    return;
+  }
+  g_heartCalOffset = val;
+  Serial.print(F("{\"type\":\"calibration\",\"status\":\"set\",\"heart_cal_offset\":"));
+  Serial.print(g_heartCalOffset, 1);
+  Serial.println(F("}"));
+}
+
 static void calSave() {
   if (calibrationSave()) {
     Serial.println(F("{\"type\":\"calibration\",\"status\":\"saved\"}"));
@@ -199,6 +231,23 @@ static void handleCalCommand(const char* rest) {
         calSetWeightOffset(rest);
       } else {
         Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"unknown weight param\"}"));
+      }
+    } else if (strcmp(target, "HEART") == 0) {
+      static char kind[16];
+      i = 0;
+      while (*rest && *rest != ' ' && i < 15) {
+        kind[i++] = static_cast<char>(*rest++);
+      }
+      kind[i] = '\0';
+      while (*rest == ' ') {
+        rest++;
+      }
+      if (strcmp(kind, "SCALE") == 0) {
+        calSetHeartScale(rest);
+      } else if (strcmp(kind, "OFFSET") == 0) {
+        calSetHeartOffset(rest);
+      } else {
+        Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"unknown heart param\"}"));
       }
     } else {
       Serial.println(F("{\"type\":\"calibration\",\"status\":\"error\",\"message\":\"unknown set target\"}"));
